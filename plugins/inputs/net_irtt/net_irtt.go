@@ -12,12 +12,14 @@ import (
 
 const measurement = "net_irtt"
 
+// TODO add all parameters
 type NetIrtt struct {
 	RemoteAddress string
 	PacketLength  int
 }
 
 func init() {
+	// TODO provid emeningful defaults
 	inputs.Add("net_irtt", func() telegraf.Input {
 		return &NetIrtt{
 			PacketLength: 100,
@@ -26,11 +28,12 @@ func init() {
 }
 
 func (s *NetIrtt) Description() string {
-	return "TBD"
+	return "Provide Isochronous Round-Trip Tester stats"
 }
 
 // SampleConfig returns sample configuration options.
 func (s *NetIrtt) SampleConfig() string {
+	// TODO: proivide an example
 	return `
   ## TBD
 `
@@ -39,6 +42,7 @@ func (s *NetIrtt) SampleConfig() string {
 // Gather is the interface for passing metrics to telegraf
 func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 
+	// TODO: move all params into config
 	cfg := irtt.NewClientConfig()
 
 	cfg.LocalAddress = ":0"
@@ -53,7 +57,7 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 	cfg.HMACKey = []byte("wazzup")
 
 	c := irtt.NewClient(cfg)
-	ctx := context.Background()
+	ctx := context.Background() // TODO: add signal handling
 	r, err := c.Run(ctx)
 
 	if err != nil {
