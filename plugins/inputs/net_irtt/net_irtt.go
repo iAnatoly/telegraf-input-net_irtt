@@ -2,19 +2,27 @@ package net_irtt
 
 import (
 	"context"
-	"fmt"
 	"time"
 	// irtt imports:
 	"github.com/heistp/irtt"
 	// telegraf imports:
 	"github.com/influxdata/telegraf"
+	"github.com/influxdata/telegraf/plugins/inputs"
 )
 
-const measurement = "irtt_stats"
+const measurement = "net_irtt"
 
 type NetIrtt struct {
 	RemoteAddress string
 	PacketLength  int
+}
+
+func init() {
+	inputs.Add("net_irtt", func() telegraf.Input {
+		return &NetIrtt{
+			PacketLength: 100,
+		}
+	})
 }
 
 func (s *NetIrtt) Description() string {
@@ -30,6 +38,7 @@ func (s *NetIrtt) SampleConfig() string {
 
 // Gather is the interface for passing metrics to telegraf
 func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
+
 	cfg := irtt.NewClientConfig()
 
 	cfg.LocalAddress = ":0"
@@ -50,10 +59,6 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("RTT min/mean/max: %s/%s/%s\n", r.RTTStats.Min, r.RTTStats.Mean(), r.RTTStats.Max)
-	fmt.Printf("jitter min/mean/max: %s/%s/%s\n", r.RoundTripIPDVStats.Min, r.RoundTripIPDVStats.Mean(), r.RoundTripIPDVStats.Max)
-	fmt.Printf("late packet count/percent: %d/%f\n", r.LatePackets, r.LatePacketsPercent)
-	fmt.Printf("lost packet percent: %f\n", r.PacketLossPercent)
 
 	fields := map[string]interface{}{
 		"RTTMin":   r.RTTStats.Min,
