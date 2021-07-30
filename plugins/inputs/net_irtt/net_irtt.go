@@ -61,10 +61,12 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 	}
 
 	fields := map[string]interface{}{
-		"RTTMin":   r.RTTStats.Min,
-		"RTTMean":  r.RTTStats.Mean(),
-		"RTTMax":   r.RTTStats.Max,
-		"IPDVMean": r.RoundTripIPDVStats.Mean(),
+		"RTTMin":   r.RTTStats.Min.Microseconds(),
+		"RTTMean":  r.RTTStats.Mean().Microseconds(),
+		"RTTMax":   r.RTTStats.Max.Microseconds(),
+		"IPDVMean": r.RoundTripIPDVStats.Mean().Microseconds(),
+		"IPDVMin":  r.RoundTripIPDVStats.Min.Microseconds(),
+		"IPDVMax":  r.RoundTripIPDVStats.Max.Microseconds(),
 		"PLPerc":   r.LatePacketsPercent,
 	}
 
