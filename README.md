@@ -1,5 +1,7 @@
 # IRTT Input Plugin
 
+(Work in progress, this is a skeleton for a plugin. Not ready for use yet)
+
 This plugin provides IRTT ([Isochronous Round-Trip Tester[(https://github.com/heistp/irtt)) statistics collection capabilities. 
 
 In current version, this plugin collects RTT (round trip time) and IPDV (jitter) network stats. It can (and should be) expanded to collect more stats, but I would like to keep it as simple as possible for the moment. 
