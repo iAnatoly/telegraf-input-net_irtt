@@ -8,7 +8,6 @@ import (
 	"github.com/heistp/irtt"
 	// telegraf imports:
 	"github.com/influxdata/telegraf"
-	"github.com/influxdata/telegraf/plugins/inputs"
 )
 
 const measurement = "irtt_stats"
@@ -68,4 +67,5 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 
 	acc.AddFields(measurement, fields, tags)
 
+	return nil
 }

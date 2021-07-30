@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	_ "github.com/iAnatoly/telegraf-input-net_irtt/plugins/input/net_irtt"
+	_ "github.com/iAnatoly/telegraf-input-net_irtt/plugins/inputs/net_irtt"
 	"github.com/influxdata/telegraf/plugins/common/shim"
 	"os"
 	"time"
