@@ -123,7 +123,7 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 			"PLPerc":   r.LatePacketsPercent,
 		}
 
-		tags := map[string]string{"RemoteAddress": server}
+		tags := map[string]string{"remote_address": server}
 
 		acc.AddFields(measurement, fields, tags)
 	}
