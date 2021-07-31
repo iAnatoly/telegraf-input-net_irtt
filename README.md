@@ -65,5 +65,6 @@ $ sudo cp net_irtt /usr/lib/telegraf/plugins/
   signal = "none"
 ```
 ## Credits
-* This self-contained plugin is based on the documentations of [Execd Go Shim](https://github.com/influxdata/telegraf/blob/master/plugins/common/shim)
-* The original idea to create a telegraf plugin for irtt came from [@nvitaly](https://github.com/nvitaly)
+* This self-contained plugin is based on the documentations of [Execd Go Shim](https://github.com/influxdata/telegraf/blob/master/plugins/common/shim).
+* This plugin is notitng but a wrapper for beautiful [IRTT](https://github.com/heistp/irtt). Credit for the ingenuity goes to the authors.
+* The original idea to create a telegraf plugin for irtt came from [@nvitaly](https://github.com/nvitaly).
