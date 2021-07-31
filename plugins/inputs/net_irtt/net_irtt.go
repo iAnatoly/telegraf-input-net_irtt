@@ -15,16 +15,16 @@ const measurement = "net_irtt"
 
 // TODO: add all the irtt parameters
 type NetIrtt struct {
-	RemoteAddress string `toml:"remote_address"`
-	HmacKey       string `toml:"hmac_key"`
-	Duration      config.Duration
-	Interval      config.Duration
-	PacketLength  int               `toml:"packet_length"`
-	LocalAddress  string            `toml:"local_address"`
-	OpenTimeouts  []config.Duration `toml:"open_timeouts"`
-	Ipv4          bool
-	Ipv6          bool
-	Ttl           int
+	RemoteAddresses []string `toml:"remote_addresses"`
+	HmacKey         string   `toml:"hmac_key"`
+	Duration        config.Duration
+	Interval        config.Duration
+	PacketLength    int               `toml:"packet_length"`
+	LocalAddress    string            `toml:"local_address"`
+	OpenTimeouts    []config.Duration `toml:"open_timeouts"`
+	Ipv4            bool
+	Ipv6            bool
+	Ttl             int
 }
 
 func init() {
@@ -47,7 +47,7 @@ func (s *NetIrtt) SampleConfig() string {
   ## these ones you probably want to adjust.
   ## irtt server should be listening on remote_address, with the same hmac_key configured
 
-  remote_address = "127.0.0.1:2112"
+  remote_addresses = [ "127.0.0.1:2112", "192.168.1.2:2112" ]
   hmac_key = "wazzup"
 
   ## run the test for 5s
@@ -68,7 +68,7 @@ func (s *NetIrtt) SampleConfig() string {
   ttl = 64
 
   ## uncomment to remove unneeded fields
-  fielddrop = [ "RTTMin", "IPDVMin" ]
+  # fielddrop = [ "RTTMin", "IPDVMin" ]
 
 `
 }
@@ -77,7 +77,9 @@ func (n *NetIrtt) getClientConfig() *irtt.ClientConfig {
 	cfg := irtt.NewClientConfig()
 
 	cfg.LocalAddress = n.LocalAddress
-	cfg.RemoteAddress = n.RemoteAddress
+	// everything but:
+	// cfg.RemoteAddress = n.RemoteAddress
+	// because we handle more than one remote address with the same set of parameters
 	cfg.OpenTimeouts = func(ts []config.Duration) []time.Duration {
 		r := make([]time.Duration, len(ts))
 		for i := range ts {
@@ -100,27 +102,31 @@ func (n *NetIrtt) getClientConfig() *irtt.ClientConfig {
 func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 
 	cfg := n.getClientConfig()
-	c := irtt.NewClient(cfg)
-	ctx := context.Background() // TODO: add signal handling
-	r, err := c.Run(ctx)
 
-	if err != nil {
-		return err
+	for _, server := range n.RemoteAddresses {
+		cfg.RemoteAddress = server
+		c := irtt.NewClient(cfg)
+		ctx := context.Background() // TODO: add signal handling
+		r, err := c.Run(ctx)
+
+		if err != nil {
+			return err
+		}
+
+		fields := map[string]interface{}{
+			"RTTMin":   r.RTTStats.Min.Microseconds(),
+			"RTTMean":  r.RTTStats.Mean().Microseconds(),
+			"RTTMax":   r.RTTStats.Max.Microseconds(),
+			"IPDVMean": r.RoundTripIPDVStats.Mean().Microseconds(),
+			"IPDVMin":  r.RoundTripIPDVStats.Min.Microseconds(),
+			"IPDVMax":  r.RoundTripIPDVStats.Max.Microseconds(),
+			"PLPerc":   r.LatePacketsPercent,
+		}
+
+		tags := map[string]string{"RemoteAddress": server}
+
+		acc.AddFields(measurement, fields, tags)
 	}
-
-	fields := map[string]interface{}{
-		"RTTMin":   r.RTTStats.Min.Microseconds(),
-		"RTTMean":  r.RTTStats.Mean().Microseconds(),
-		"RTTMax":   r.RTTStats.Max.Microseconds(),
-		"IPDVMean": r.RoundTripIPDVStats.Mean().Microseconds(),
-		"IPDVMin":  r.RoundTripIPDVStats.Min.Microseconds(),
-		"IPDVMax":  r.RoundTripIPDVStats.Max.Microseconds(),
-		"PLPerc":   r.LatePacketsPercent,
-	}
-
-	tags := map[string]string{"RemoteAddress": cfg.RemoteAddress}
-
-	acc.AddFields(measurement, fields, tags)
 
 	return nil
 }
