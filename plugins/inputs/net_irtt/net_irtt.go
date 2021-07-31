@@ -91,7 +91,6 @@ func (n *NetIrtt) getClientConfig() *irtt.ClientConfig {
 	cfg.IPVersion = irtt.IPVersionFromBooleans(n.Ipv4, n.Ipv6, irtt.DualStack)
 	cfg.TTL = n.Ttl
 	cfg.HMACKey = []byte(n.HmacKey)
-	fmt.Println(n)
 
 	return cfg
 }
