@@ -1,6 +1,6 @@
 # IRTT Input Plugin
 
-(Work in progress, this is a skeleton for a plugin. Not ready for use yet)
+## Summary
 
 This plugin provides IRTT ([Isochronous Round-Trip Tester[(https://github.com/heistp/irtt)) statistics collection capabilities. 
 
@@ -12,29 +12,56 @@ Couple of notes:
 
 ## Configuration
 
-TBD
-
-Sample config:
+Sample config (see plugin.conf in the repo):
 ```toml
-#
+[[inputs.net_irtt]]
+
+  ## these ones you probably want to adjust.
+  ## irtt server should be listening on remote_address, with the same hmac_key configured
+
+  remote_addresses = [ "127.0.0.1:2112", "192.168.1.1:2112" ]
+  hmac_key = "wazzup" 
+
+  ## run the test for 5s
+  duration = "5s"
+
+  ## send packets every 20ms, 100b payload
+  ## very similar to RTP
+
+  interval = "20ms"
+  # packet_length = 100
+
+  ## override as needed 
+
+  local_address = ":0"
+  open_timeouts = ["1s"]
+  ipv4 = true
+  ipv6 = false
+  ttl = 64
+
 ```
 
 ## Installation
 
 * Clone the repo
-
-```
+```bash
 git clone 
 ```
 * Build the "net_irtt" binary
 
-```
+```bash
 $ go build -o net_irtt cmd/main.go
+```
+* Edit the config
+* Copy the binary and the config to an appropriate location
+```bash
+$ sudo cp plugin.config /etc/telegraf/telegraf-irtt.config
+$ sudo cp net_irtt /usr/lib/telegraf/plugins/
 ```
 * You should be able to call this from telegraf now using execd
 ```
 [[inputs.execd]]
-  command = ["/path/to/net_irtt", "-poll_interval 1m"]
+  command = ["/usr/lib/telegraf/plugins/net_irtt", "-config", "/etc/telegraf/telegraf-irtt.config" ]
   signal = "none"
 ```
 This self-contained plugin is based on the documentations of [Execd Go Shim](https://github.com/influxdata/telegraf/blob/master/plugins/common/shim)
