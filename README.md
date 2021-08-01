@@ -52,7 +52,7 @@ git clone
 ```bash
 $ go build -o net_irtt cmd/main.go
 # or, if you need to cross-compile for arm64, because you run your probes on rPI:
-$ env GOOS=linux GOARCH=arm64 go build -o net_irtt.arm64 cmd/main.go
+$ env GOOS=linux GOARCH=arm GOARM=7 go build -o net_irtt.arm7 cmd/main.go
 ```
 * Edit the config
 * Copy the binary and the config to an appropriate location
