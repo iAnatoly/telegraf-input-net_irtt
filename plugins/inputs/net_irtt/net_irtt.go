@@ -28,10 +28,15 @@ type NetIrtt struct {
 }
 
 func init() {
-	// TODO provid emeningful defaults
 	inputs.Add("net_irtt", func() telegraf.Input {
 		return &NetIrtt{
 			PacketLength: 100,
+			Ipv4:         true,
+			Ipv6:         false,
+			Ttl:          64,
+			LocalAddress: ":0",
+			Duration:     config.Duration(time.Second * 5),
+			Interval:     config.Duration(time.Millisecond * 20),
 		}
 	})
 }
@@ -42,7 +47,6 @@ func (s *NetIrtt) Description() string {
 
 // SampleConfig returns sample configuration options.
 func (s *NetIrtt) SampleConfig() string {
-	// TODO: proivide an example
 	return `
   ## these ones you probably want to adjust.
   ## irtt server should be listening on remote_address, with the same hmac_key configured
@@ -106,7 +110,7 @@ func (n *NetIrtt) Gather(acc telegraf.Accumulator) error {
 	for _, server := range n.RemoteAddresses {
 		cfg.RemoteAddress = server
 		c := irtt.NewClient(cfg)
-		ctx := context.Background() // TODO: add signal handling
+		ctx := context.Background()
 		r, err := c.Run(ctx)
 
 		if err != nil {
