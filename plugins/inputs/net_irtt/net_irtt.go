@@ -12,6 +12,7 @@ import (
 )
 
 const measurement = "net_irtt"
+const input = "net_irtt"
 
 // TODO: add all the irtt parameters
 type NetIrtt struct {
@@ -27,17 +28,22 @@ type NetIrtt struct {
 	Ttl             int
 }
 
+func getDefaultConfig() *NetIrtt {
+	return &NetIrtt{
+		Duration:     config.Duration(time.Second * 5),
+		Interval:     config.Duration(time.Millisecond * 20),
+		PacketLength: 100,
+		LocalAddress: ":0",
+		OpenTimeouts: []config.Duration{config.Duration(time.Second * 1)},
+		Ipv4:         true,
+		Ipv6:         false,
+		Ttl:          64,
+	}
+}
+
 func init() {
-	inputs.Add("net_irtt", func() telegraf.Input {
-		return &NetIrtt{
-			PacketLength: 100,
-			Ipv4:         true,
-			Ipv6:         false,
-			Ttl:          64,
-			LocalAddress: ":0",
-			Duration:     config.Duration(time.Second * 5),
-			Interval:     config.Duration(time.Millisecond * 20),
-		}
+	inputs.Add(input, func() telegraf.Input {
+		return getDefaultConfig()
 	})
 }
 
