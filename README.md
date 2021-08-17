@@ -43,24 +43,19 @@ Sample config (see plugin.conf in the repo):
 
 ## Installation
 
-* Clone the repo
-```bash
-git clone 
-```
-* Build the "net_irtt" binary
-
-```bash
-$ go build -o net_irtt cmd/main.go
-# or, if you need to cross-compile for arm64, because you run your probes on rPI:
-$ env GOOS=linux GOARCH=arm GOARM=7 go build -o net_irtt.arm7 cmd/main.go
-```
-* Edit the config
+* Clone the repo `git clone ...` 
+* Build the "net_irtt" binary:
+    * for AMD64: `$ go build -o net_irtt cmd/main.go`
+    * for ARM64 (Raspberry Pi 4): `$ env GOOS=linux GOARCH=arm64 go build -o net_irtt.arm64 cmd/main.go`
+    * for ARMv7l (Raspberry Pi 3b): `$ env GOOS=linux GOARCH=arm GOARM=7 go build -o net_irtt.armv7l cmd/main.go`
+    * for ARMv6l (Raspberry Pi Zero): `$ env GOOS=linux GOARCH=arm GOARM=6 go build -o net_irtt.armv6l cmd/main.go`
+* Edit the config: `vi plugin.config` 
 * Copy the binary and the config to an appropriate location
 ```bash
 $ sudo cp plugin.config /etc/telegraf/telegraf-irtt.config
 $ sudo cp net_irtt /usr/lib/telegraf/plugins/
 ```
-* You should be able to call this from telegraf now using execd
+* You should be able to call this from telegraf now using execd:
 ```
 [[inputs.execd]]
   command = ["/usr/lib/telegraf/plugins/net_irtt", "-config", "/etc/telegraf/telegraf-irtt.config" ]
